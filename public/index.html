@@ -1,0 +1,326 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>Collageify</title>
+  <script src="https://kit.fontawesome.com/12dfcd1568.js" crossorigin="anonymous"></script>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+  <link rel="stylesheet" type="text/css" href="./style.css">
+</head>
+
+<body>
+  <div class="container-fluid text-center">
+    <div class="row align-items-center mt-5" id="login">
+      <div class="col-md-12 col-sm-12">
+        <h1>Reflect your music taste with</h1>
+        <h1 id="name">Collageify</h1>
+        <p><br>Create a collage of your most beloved songs! Use it as your wallpaper or print for everyone to
+          see.<br>Press
+          the button to start:<br></p>
+
+        <a href="/login" class="btn btn-success">
+          <i class="fa-brands fa-spotify" style="color: #ffffff;"></i>
+          Log in to Spotify</a>
+      </div>
+    </div>
+    <div id="loggedin">
+      <div id="user-profile">
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-12 col-sm-12 text-center p-5" id="collage">
+      </div>
+      <div class="row">
+        <div class="col-md-12 col-sm-12" id="collage-buttons">
+        </div>
+      </div>
+    </div>
+
+    <script id="user-profile-template" type="text/x-handlebars-template">
+      <h1>Loading your profile data...</h1>
+      <!-- button to get top tracks -->
+    </script>
+
+
+
+    <script src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/2.0.0-alpha.1/handlebars.min.js"></script>
+    <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+    <script>
+
+      $('#collage-buttons').hide();
+
+      var globalArray = [];
+      (function () {
+
+        /**
+         * Obtains parameters from the hash of the URL
+         * @return Object
+         */
+        function getHashParams() {
+          var hashParams = {};
+          var e, r = /([^&;=]+)=?([^&;]*)/g,
+            q = window.location.hash.substring(1);
+          while (e = r.exec(q)) {
+            hashParams[e[1]] = decodeURIComponent(e[2]);
+          }
+          return hashParams;
+        }
+
+        var userProfileSource = document.getElementById('user-profile-template').innerHTML,
+          userProfileTemplate = Handlebars.compile(userProfileSource),
+          userProfilePlaceholder = document.getElementById('user-profile');
+
+        var params = getHashParams();
+
+        var access_token = params.access_token,
+          refresh_token = params.refresh_token,
+          error = params.error;
+
+        if (error) {
+          alert('There was an error during the authentication');
+        } else {
+          if (access_token) {
+
+            $.ajax({
+              url: 'https://api.spotify.com/v1/me',
+              headers: {
+                'Authorization': 'Bearer ' + access_token
+              },
+              success: function (response) {
+                userProfilePlaceholder.innerHTML = userProfileTemplate(response);
+
+                $('#login').hide();
+                $('#loggedin').show();
+              }
+            });
+          } else {
+            // render initial screen
+            $('#login').show();
+            $('#loggedin').hide();
+          }
+
+
+        }
+      })();
+    </script>
+    <script>
+
+      function getTopTracks(callback) {
+        var hashParams = {};
+        var e, r = /([^&;=]+)=?([^&;]*)/g,
+          q = window.location.hash.substring(1);
+        while (e = r.exec(q)) {
+          hashParams[e[1]] = decodeURIComponent(e[2]);
+        }
+
+        var access_token = hashParams.access_token,
+          refresh_token = hashParams.refresh_token,
+          error = hashParams.error;
+
+        console.log('access_token:', access_token);
+
+        if (error) {
+          alert('There was an error during authentication');
+        } else {
+          if (access_token) {
+            fetchTopTracks(access_token, callback);
+          }
+        }
+      }
+
+      function fetchTopTracks(access_token, callback) {
+        var xhr = new XMLHttpRequest();
+
+        xhr.open('GET', 'https://api.spotify.com/v1/me/top/tracks?time_range=short_term&limit=20&offset=1', true);
+        xhr.setRequestHeader('Authorization', 'Bearer ' + access_token);
+
+        xhr.onload = function () {
+          if (xhr.status === 200) {
+            var data = JSON.parse(xhr.responseText);
+            console.log(data);
+            var songArray = handleTopTracks(data);
+            callback(songArray);
+          } else {
+            console.error('Error fetching top tracks:', xhr.status);
+          }
+        };
+
+        xhr.send();
+      }
+
+      function handleTopTracks(data) {
+        var songArray = [];
+        for (var i = 0; i < data.items.length; i++) {
+          var song = {
+            name: data.items[i].name,
+            artist: data.items[i].artists[0].name,
+            albumCover: data.items[i].album.images[0].url
+          };
+          songArray.push(song);
+        }
+
+        return songArray;
+      }
+
+      function createTopTracksLayout(songArray) {
+        //fake array with 20 songs
+
+        var i = 0;
+        var container = document.createElement('div');
+        container.classList.add('container-fluid', 'text-center', 'mt-5', 'p-5');
+        var row1 = document.createElement('div');
+        row1.classList.add('row');
+        var col1 = document.createElement('div');
+        col1.classList.add('col-md-12', 'col-sm-12');
+        var h1 = document.createElement('h1');
+        h1.textContent = 'Your top tracks';
+        var p = document.createElement('p');
+        //guard statement - if there are less than 20 songs, display according text 
+        if (songArray.length < 11) {
+          p.innerHTML = '<br>In total, there were ' + songArray.length + ' songs found in your Spotify top. <br>Unfortunately, we need at least 20 songs to create a collage. <br>Try again in a few days!';
+        } else {
+          p.innerHTML = '<br>In total, there were ' + songArray.length + ' songs found in your Spotify top.';
+          //make a button 'create a collage'
+          var collageButton = document.createElement('a');
+          //listen for click event
+          collageButton.addEventListener('click', function () {
+            //create a collage
+            createCollageImage(songArray);
+          });
+          collageButton.classList.add('btn', 'btn-success');
+          collageButton.textContent = 'Create a collage';
+        }
+        var collageButtonStatus = document.createElement('div');
+        var logoutButton = document.createElement('a');
+        logoutButton.classList.add('btn', 'btn-danger');
+        logoutButton.textContent = 'Log out';
+        logoutButton.href = '/logout';
+
+        col1.appendChild(h1);
+        col1.appendChild(p);
+        col1.appendChild(collageButtonStatus);
+        col1.appendChild(logoutButton);
+        col1.appendChild(collageButton);
+        row1.appendChild(col1);
+        container.appendChild(row1);
+
+        var row2 = document.createElement('div');
+        row2.classList.add('row', 'w-75', 'mx-auto', 'd-flex');
+
+        songArray.forEach(function (track) {
+          var url = track.albumCover;
+          var song_name = track.name;
+          var artist = track.artist;
+
+          var col2 = document.createElement('div');
+          col2.classList.add('col-md-2', 'col-sm-6');
+          var img = document.createElement('img');
+          img.src = url;
+          img.alt = '';
+          img.classList.add('img-thumbnail');
+          img.setAttribute('defer', '');
+          col2.appendChild(img);
+
+          var col3 = document.createElement('div');
+          col3.classList.add('col-md-2', 'col-sm-6');
+          var h3 = document.createElement('h3');
+          h3.textContent = song_name;
+          var p2 = document.createElement('p');
+          p2.textContent = artist;
+          col3.appendChild(h3);
+          col3.appendChild(p2);
+
+          row2.appendChild(col2);
+          row2.appendChild(col3);
+
+          i++;
+        });
+
+        container.appendChild(row2);
+
+        // Append the container to the 'loggedin' div
+        var loggedInDiv = document.getElementById('loggedin');
+        loggedInDiv.innerHTML = '';
+        loggedInDiv.appendChild(container);
+      }
+
+      getTopTracks(function (songArray) {
+        createTopTracksLayout(songArray);
+        globalArray = songArray;
+      });
+
+
+      function createCollageImage(songArray) {
+
+        // randomize the order of items in the array
+
+        songArray = songArray.sort(function (a, b) {
+          return 0.5 - Math.random();
+        });
+
+        var xcoord = 0;
+        var ycoord = 0;
+        var canvas = document.createElement('canvas');
+        canvas.width = 500;
+        canvas.height = 400;
+        var ctx = canvas.getContext('2d');
+
+        function drawImageOnCanvas(img, x, y) {
+          ctx.drawImage(img, x, y, 100, 100);
+        }
+
+        function loadImageAndDraw(x, y) {
+          var img = new Image();
+          img.onload = function () {
+            drawImageOnCanvas(img, x, y);
+          };
+          img.src = songArray[i].albumCover;
+        }
+
+        for (var i = 0; i < songArray.length; i++) {
+          loadImageAndDraw(xcoord, ycoord);
+          xcoord += 100;
+          if (xcoord > 400) {
+            xcoord = 0;
+            ycoord += 100;
+          }
+        }
+
+        $('#loggedin').hide();
+
+        document.getElementById('collage').appendChild(canvas);
+        // make the canvas html element bigger
+        canvas.style.width = '1000px';
+        $('#collage-buttons').show();
+      }
+
+      // button to regenerate collage
+      var regenerateButton = document.createElement('a');
+      regenerateButton.addEventListener('click', function () {
+        // delete the old canvas without deleting the regererate button
+        document.getElementById('collage').removeChild(document.getElementById('collage').lastChild);
+        createCollageImage(globalArray);
+      });
+      regenerateButton.classList.add('btn', 'btn-success');
+      regenerateButton.textContent = 'Regenerate';
+      document.getElementById('collage-buttons').appendChild(regenerateButton);
+
+
+      // create button to log out of spotify account
+      var logoutButton = document.createElement('a');
+      logoutButton.href = '/logout';
+      logoutButton.classList.add('btn', 'btn-danger');
+      logoutButton.textContent = 'Log out';
+      document.getElementById('collage-buttons').appendChild(logoutButton);
+
+    </script>
+
+
+
+
+
+</body>
+
+</html>

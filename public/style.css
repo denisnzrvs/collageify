@@ -1,0 +1,29 @@
+.btn {
+  background-color: #000000;
+  color: white;
+}
+
+#name {
+color: #772E25;
+  font-style: bold;
+  font-size: 42pt;
+}
+
+a {
+  color: #000000;
+}
+
+body {
+  background-color: #F1DDCF;
+  background-image: linear-gradient(90deg, #F1DDCF 0%, #9599E2 100%);
+}
+
+h1   {
+  color: #1f1224;
+  font-size: 32pt;
+}
+
+p {
+  color: #1f1224;
+  font-size: 16pt;
+}
