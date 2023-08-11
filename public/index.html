@@ -42,10 +42,7 @@
 
 
   <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
-
   <script>
-    songList = [];
-
     //DEBUG
     testSongList = [];
 
@@ -193,77 +190,10 @@
         artistName.innerHTML = element.artist;
         songTextColumn.appendChild(artistName);
       });
-
-      function createCollageImage() {
-        alert('A newer, more advanced collage generator is coming soon!')
-      }
-
-    // OLD COLLAGE GENERATION SCRIPT
-    // function createCollageImage(songArray) {
-
-    //   // randomize the order of items in the array
-
-    //   songArray = songArray.sort(function (a, b) {
-    //     return 0.5 - Math.random();
-    //   });
-
-    //   var xcoord = 0;
-    //   var ycoord = 0;
-    //   var canvas = document.createElement('canvas');
-    //   canvas.width = 500;
-    //   canvas.height = 400;
-    //   var ctx = canvas.getContext('2d');
-
-    //   function drawImageOnCanvas(img, x, y) {
-    //     ctx.drawImage(img, x, y, 100, 100);
-    //   }
-
-    //   function loadImageAndDraw(x, y) {
-    //     var img = new Image();
-    //     img.onload = function () {
-    //       drawImageOnCanvas(img, x, y);
-    //     };
-    //     img.src = songArray[i].albumCover;
-    //   }
-
-    //   for (var i = 0; i < songArray.length; i++) {
-    //     loadImageAndDraw(xcoord, ycoord);
-    //     xcoord += 100;
-    //     if (xcoord > 400) {
-    //       xcoord = 0;
-    //       ycoord += 100;
-    //     }
-    //   }
-
-    //   $('#loggedin').hide();
-
-    //   document.getElementById('collage').appendChild(canvas);
-    //   // make the canvas html element bigger
-    //   canvas.style.width = '1000px';
-    //   $('#collage-buttons').show();
-    // }
-
-    // // button to regenerate collage
-    // var regenerateButton = document.createElement('a');
-    // regenerateButton.addEventListener('click', function () {
-    //   // delete the old canvas without deleting the regererate button
-    //   document.getElementById('collage').removeChild(document.getElementById('collage').lastChild);
-    //   createCollageImage(globalArray);
-    // });
-    // regenerateButton.classList.add('btn', 'btn-success');
-    // regenerateButton.textContent = 'Regenerate';
-    // document.getElementById('collage-buttons').appendChild(regenerateButton);
-
-
-    // // create button to log out of spotify account
-    // var logoutButton = document.createElement('a');
-    // logoutButton.href = '/logout';
-    // logoutButton.classList.add('btn', 'btn-danger');
-    // logoutButton.textContent = 'Log out';
-    // document.getElementById('collage-buttons').appendChild(logoutButton);
-
-
     }
+    function createCollageImage() {
+    }
+
   </script>
 
 
