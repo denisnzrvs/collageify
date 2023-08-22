@@ -13,6 +13,7 @@ var cors = require('cors');
 var querystring = require('querystring');
 var cookieParser = require('cookie-parser');
 
+
 var CONFIG = require('./config.json');
 
 
@@ -65,7 +66,6 @@ app.get('/logout', function (req, res) {
   // redirect to spotify logout page
   res.redirect('https://www.spotify.com/logout/');
 });
-
 
 app.get('/callback', function (req, res) {
 

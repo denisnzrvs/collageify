@@ -40,11 +40,13 @@
   </div>
   </div>
 
+  <script src="https://unpkg.com/screen-size-detector@latest/dist/screen-size-detector.min.js"></script>
 
-  <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+  <script src="https://code.jquery.com/jquery-1.10.1.min.js"></script>
   <script>
     //DEBUG
     testSongList = [];
+    songList = [];
 
 
     (function () {
@@ -129,7 +131,7 @@
       collageButton.classList.add('btn', 'btn-success');
       collageButton.innerText = 'Create collage';
       collageButton.addEventListener('click', function () {
-        createCollageImage(songList);
+        createCollage();
       });
       document.getElementById('logged-in').appendChild(collageButton);
 
@@ -190,8 +192,28 @@
         artistName.innerHTML = element.artist;
         songTextColumn.appendChild(artistName);
       });
-    }
-    function createCollageImage() {
+
+      function createCollage() {
+        let layers = 2;
+        let h = screen.availHeight;
+        let w = screen.availWidth;
+
+        document.getElementById('logged-in').innerHTML = "";
+
+        let images = [];
+        songList.forEach(song => {
+          x = new Image(300, 300);
+          x.src = `${song.albumArtURL}`;
+
+          images.push(x);
+        });
+        document.getElementById('logged-in').appendChild(images[0]);
+
+        let resText = "Your screen resolution is " + w + " px by " + h + " px."
+        let res = document.createElement("p");
+        res.innerHTML = resText;
+        document.getElementById('logged-in').appendChild(res);
+      }
     }
 
   </script>

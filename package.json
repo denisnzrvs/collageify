@@ -18,6 +18,7 @@
     "fs": "^0.0.1-security",
     "nodejs": "^0.0.0",
     "request": "^2.88.2",
-    "screen-size": "^1.0.0"
+    "screen-size": "^1.0.0",
+    "screen-size-detector": "^1.0.4"
   }
 }
