@@ -1,30 +1,4 @@
-.btn {
-  background-color: #000000;
-  color: white;
-}
-
-.container-fluid {
-  height: 100%;
-}
-
-#name {
-color: #772E25;
-  font-style: bold;
-  font-size: 42pt;
-}
-.fa-github {
-  text-decoration: none;
-}
-a {
-  color: #000000;
-}
-
-h1   {
-  color: #1f1224;
-  font-size: 32pt;
-}
-
-p {
-  color: #1f1224;
-  font-size: 16pt;
+html,
+body {
+    min-height: 100%;
 }
