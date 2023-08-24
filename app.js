@@ -40,10 +40,18 @@ var stateKey = 'spotify_auth_state';
 
 var app = express();
 
+app.set('view engine', 'ejs');
+app.set('views', './views');
+
+
 app.use(express.static(__dirname + '/public'))
   .use(cors())
   .use(cookieParser());
 
+
+app.get('/', function (req, res) {
+  res.render('index.ejs');
+});
 
 app.get('/login', function (req, res) {
 
@@ -61,6 +69,10 @@ app.get('/login', function (req, res) {
       state: state
     }));
 });
+
+app.get('/generate', function (req, res) {
+  res.render('collage.ejs');
+})
 
 app.get('/logout', function (req, res) {
   // redirect to spotify logout page

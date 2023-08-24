@@ -130,9 +130,7 @@
       var collageButton = document.createElement('a');
       collageButton.classList.add('btn', 'btn-success');
       collageButton.innerText = 'Create collage';
-      collageButton.addEventListener('click', function () {
-        createCollage();
-      });
+      collageButton.href = "/generate";
       document.getElementById('logged-in').appendChild(collageButton);
 
       var logoutButton = document.createElement('a');

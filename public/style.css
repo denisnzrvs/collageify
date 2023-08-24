@@ -3,19 +3,20 @@
   color: white;
 }
 
+.container-fluid {
+  height: 100%;
+}
+
 #name {
 color: #772E25;
   font-style: bold;
   font-size: 42pt;
 }
-
+.fa-github {
+  text-decoration: none;
+}
 a {
   color: #000000;
-}
-
-body {
-  background-color: #F1DDCF;
-  background-image: linear-gradient(90deg, #F1DDCF 0%, #9599E2 100%);
 }
 
 h1   {
