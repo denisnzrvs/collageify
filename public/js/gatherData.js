@@ -112,7 +112,7 @@ function createSummaryLayout() {
 
     // each song overall represented by a column in a row
     songColumn = document.createElement("div");
-    songColumn.classList.add("col-4", "mb-5", "text-primary");
+    songColumn.classList.add("col-md-4", "col-sm-12", "mb-5", "text-primary");
     mainRow.appendChild(songColumn);
 
     // each song column contains a row, in which are contained two other columns - one for the album art, and one for the song name and artist name
