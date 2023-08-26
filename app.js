@@ -52,7 +52,7 @@ app.use(express.static(__dirname + '/public'))
 app.get('/', (req, res) => {
   // Render the 'index.ejs' template
   res.render('index');
-}); 
+});
 
 app.get('/login', function (req, res) {
 
@@ -72,7 +72,11 @@ app.get('/login', function (req, res) {
 });
 
 app.get('/generate', function (req, res) {
-  res.render('collage.ejs');
+  const receivedData = req.query.data; // Get the data from the query parameter
+  const songList = JSON.parse(receivedData); // Parse the JSON data
+
+  // Now you can render the template with the songList data
+  res.render('collage', { songList: songList });
 })
 
 app.get('/logout', function (req, res) {
