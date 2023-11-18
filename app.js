@@ -12,11 +12,11 @@ var request = require('request'); // "Request" library
 var cors = require('cors');
 var querystring = require('querystring');
 var cookieParser = require('cookie-parser');
-require('dotenv').config();
+CONFIG = require('./config.json');
 
-const client_id = process.env.CLIENT_ID;
-const client_secret = process.env.CLIENT_SECRET;
-const redirect_uri = process.env.REDIRECT_URI;
+const client_id = CONFIG.client_id;
+const client_secret = CONFIG.client_secret;
+const redirect_uri = CONFIG.redirect_uri;
 
 /**
  * Generates a random string containing numbers and letters
