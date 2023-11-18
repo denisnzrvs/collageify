@@ -142,7 +142,8 @@ function createSummaryLayout() {
 
     document.getElementById('generateButton').addEventListener('click', () => {
       // Redirect to the '/generate' route with data as query parameter
-      window.location.href = `/generate?data=${JSON.stringify(songList)}`;
+      const urlList = songList.map(song => song.albumArtURL);
+      window.location.href = `/generate?data=${JSON.stringify(urlList)}`;
     });
 
     function createCollage() {

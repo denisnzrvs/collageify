@@ -71,13 +71,21 @@ app.get('/login', function (req, res) {
     }));
 });
 
-app.get('/generate', function (req, res) {
-  const receivedData = req.query.data; // Get the data from the query parameter
-  const songList = JSON.parse(receivedData); // Parse the JSON data
+app.get('/generate', (req, res) => {
+  // Get the data from the query parameter
+  const receivedData = req.query.data;
 
-  // Now you can render the template with the songList data
-  res.render('collage', { songList: songList });
-})
+  // Parse the JSON data
+  const songList = JSON.parse(receivedData);
+
+  // Extract the albumArtURL from each object and create a new array
+  const urlList = songList.map(song => song.albumArtURL);
+
+  // Render the 'collage' view with the urlList data
+  res.render('collage', { urlList });
+});
+
+
 
 app.get('/logout', function (req, res) {
   // redirect to spotify logout page
@@ -170,5 +178,5 @@ app.get('/refresh_token', function (req, res) {
   });
 });
 
-console.log('Listening on 5000');
-app.listen(5000);
+console.log('Listening on 8000');
+app.listen(8000); 
