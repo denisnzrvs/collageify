@@ -43,7 +43,8 @@ if (songList.length > 0) {
     canvas.height = h / 2;
     // Get the div element with id 'resultImage'
     const collageDiv = document.getElementById('resultImage');
-
+    collageDiv.style.height = h / 2 + 'px';
+    collageDiv.style.width = w / 2 + 'px';
     // Append the canvas element to the div
     collageDiv.appendChild(canvas);
 
