@@ -39,8 +39,8 @@ if (songList.length > 0) {
     canvas = document.createElement('canvas');
     // Set the id of the canvas element
     canvas.id = 'collageCanvas';
-    canvas.width = w / 2;
-    canvas.height = h / 2;
+    canvas.width = w;
+    canvas.height = h;
     // Get the div element with id 'resultImage'
     const collageDiv = document.getElementById('resultImage');
     collageDiv.style.height = h / 2 + 'px';
@@ -48,15 +48,42 @@ if (songList.length > 0) {
     // Append the canvas element to the div
     collageDiv.appendChild(canvas);
 
-
     // Get the 2D rendering context of the canvas
     let ctx = canvas.getContext('2d');
 
     // Use the correct function call to get random coordinates
     let coords = getRandomCoords();
 
-    // Call makeSquares with the correct argument
-    makeSquares(ctx, 10);
+    // Counter to track loaded images
+    let loadedImageCount = 0;
+
+    // Load images and draw on canvas
+    for (let i = 0; i < 10; i++) {
+        let coords = getRandomCoords();
+        let image = new Image();
+
+        // Set the source of the image to the imageURL in songList
+        image.src = songList[i];
+
+        // Set up the onload event to track when the image is loaded
+        image.onload = function () {
+            let aspectRatio = image.width / image.height;
+            let imgWidth = Math.min(getImageSide(), getImageSide() * aspectRatio);
+            let imgHeight = Math.min(getImageSide(), getImageSide() / aspectRatio);
+
+            ctx.drawImage(image, coords[0], coords[1], imgWidth, imgHeight);
+
+            // Increment the loaded image count
+            loadedImageCount++;
+
+            canvas.crossOrigin = "anonymous";
+            // Check if all images are loaded before setting href
+            if (loadedImageCount === 10) {
+                const downloadButton = document.getElementById('downloadBtn');
+                downloadButton.href = canvas.toDataURL();
+            }
+        };
+    }
 } else {
     loadStatus.innerHTML += 'false';
 }
@@ -70,11 +97,11 @@ function getRandomCoords() {
     let isValid = false;
 
     do {
-        x = Math.floor(Math.random() * (w / 2 - getImageSide())); // Adjusted the calculation
-        y = Math.floor(Math.random() * (h / 2 - getImageSide())); // Adjusted the calculation
+        x = Math.floor(Math.random() * (w - getImageSide())); // Adjusted the calculation
+        y = Math.floor(Math.random() * (h - getImageSide())); // Adjusted the calculation
         console.log('possible coords: ' + x + ' ' + y);
 
-        if (x < w / 2 - getImageSide() || y < h / 2 - getImageSide()) {
+        if (x < w - getImageSide() || y < h - getImageSide()) {
             isValid = true;
         }
     } while (!isValid);
@@ -90,6 +117,7 @@ function makeSquares(ctx, count) {
     for (let i = 0; i < count; i++) {
         let coords = getRandomCoords();
         let image = new Image();
+        image.crossOrigin = "anonymous";
 
         // Set the source of the image to the imageURL in songList
         image.src = songList[i];
