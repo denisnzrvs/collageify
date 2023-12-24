@@ -1,11 +1,11 @@
 /**
  * This is an example of a basic node.js script that performs
- * the Authorization Code oAuth2 flow to authenticate against
- * the Spotify Accounts.
+  * the Authorization Code oAuth2 flow to authenticate against
+    * the Spotify Accounts.
  *
  * For more information, read
- * https://developer.spotify.com/web-api/authorization-guide/#authorization_code_flow
- */
+  * https://developer.spotify.com/web-api/authorization-guide/#authorization_code_flow
+*/
 
 var express = require('express'); // Express web server framework
 var request = require('request'); // "Request" library
@@ -46,7 +46,10 @@ app.use(express.static(__dirname + '/public'))
   .use(cors())
   .use(cookieParser());
 
-app.get('/login', function(req, res) {
+app.get('/', (req, res) => {
+  // Render the 'index.ejs' template
+  res.render('index');
+});
 
 app.get('/login', function (req, res) {
 
@@ -65,12 +68,26 @@ app.get('/login', function (req, res) {
     }));
 });
 
-app.get('/logout', function(req, res) {
+app.get('/generate', (req, res) => {
+  // Get the data from the query parameter
+  const receivedData = req.query.data;
+
+  // Parse the JSON data
+  const songList = JSON.parse(receivedData);
+
+  // Extract the albumArtURL from each object and create a new array
+  const urlList = songList.map(song => song.albumArtURL);
+
+  // Render the 'collage' view with the urlList data
+  res.render('collage', { urlList });
+});
+
+
+
+app.get('/logout', function (req, res) {
   // redirect to spotify logout page
   res.redirect('https://www.spotify.com/logout/');
 });
-
-app.get('/callback', function(req, res) {
 
 app.get('/callback', function (req, res) {
 
@@ -158,5 +175,5 @@ app.get('/refresh_token', function (req, res) {
   });
 });
 
-console.log('Listening on 5000');
-app.listen(5000);
+console.log('Listening on 8000');
+app.listen(8000); 
