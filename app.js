@@ -46,10 +46,7 @@ app.use(express.static(__dirname + '/public'))
   .use(cors())
   .use(cookieParser());
 
-app.get('/', (req, res) => {
-  // Render the 'index.ejs' template
-  res.render('index');
-});
+app.get('/login', function(req, res) {
 
 app.get('/login', function (req, res) {
 
@@ -68,26 +65,12 @@ app.get('/login', function (req, res) {
     }));
 });
 
-app.get('/generate', (req, res) => {
-  // Get the data from the query parameter
-  const receivedData = req.query.data;
-
-  // Parse the JSON data
-  const songList = JSON.parse(receivedData);
-
-  // Extract the albumArtURL from each object and create a new array
-  const urlList = songList.map(song => song.albumArtURL);
-
-  // Render the 'collage' view with the urlList data
-  res.render('collage', { urlList });
-});
-
-
-
-app.get('/logout', function (req, res) {
+app.get('/logout', function(req, res) {
   // redirect to spotify logout page
   res.redirect('https://www.spotify.com/logout/');
 });
+
+app.get('/callback', function(req, res) {
 
 app.get('/callback', function (req, res) {
 
@@ -175,5 +158,5 @@ app.get('/refresh_token', function (req, res) {
   });
 });
 
-console.log('Listening on 8000');
-app.listen(8000); 
+console.log('Listening on 5000');
+app.listen(5000);
