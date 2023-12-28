@@ -2,9 +2,7 @@
 //1. Right now, the canvas where the image is created, is displayed right on the page. However, the page display is supposed to be just a preivew with image half the actual size. Right now, the canvas is half the actual size. Figure out a way to get the resulting image out of the canvas, show it on page and download. When it is achieved, do not add canvas to DOM and make it full-size. Images are also half-size!
 
 //2. To do:
-// Add 2 layers
-// Add collision/overlap detection in layer
-// Replace rectangles with images
+// Add 2 layers - refactor ovelap detection to work within isolated layers
 // Refine image sizing and possibly positioning
 
 //stores squares on layer
@@ -58,6 +56,7 @@ if (songList.length > 0) {
     let loadedImageCount = 0;
 
     // Load images and draw on canvas
+    // Load images and draw on canvas
     for (let i = 0; i < 10; i++) {
         let coords = getRandomCoords();
         let image = new Image();
@@ -71,7 +70,17 @@ if (songList.length > 0) {
             let imgWidth = Math.min(getImageSide(), getImageSide() * aspectRatio);
             let imgHeight = Math.min(getImageSide(), getImageSide() / aspectRatio);
 
+            let coords = getRandomCoords(imgWidth, imgHeight);
+
             ctx.drawImage(image, coords[0], coords[1], imgWidth, imgHeight);
+
+            // Add the image to the squares array
+            squares.push({
+                x: coords[0],
+                y: coords[1],
+                width: imgWidth,
+                height: imgHeight
+            });
 
             // Increment the loaded image count
             loadedImageCount++;
@@ -88,51 +97,40 @@ if (songList.length > 0) {
     loadStatus.innerHTML += 'false';
 }
 
+
+function isOverlap(x, y, width, height) {
+    for (let i = 0; i < squares.length; i++) {
+        let square = squares[i];
+        if (x < square.x + square.width &&
+            x + width > square.x &&
+            y < square.y + square.height &&
+            y + height > square.y) {
+            return true;
+        }
+    }
+    return false;
+}
+
 function getImageSide() {
     return 300 * ratio;
 }
 
-function getRandomCoords() {
+function getRandomCoords(width, height) {
     let x, y;
-    let isValid = false;
+    let overlap = false;
 
     do {
-        x = Math.floor(Math.random() * (w - getImageSide())); // Adjusted the calculation
-        y = Math.floor(Math.random() * (h - getImageSide())); // Adjusted the calculation
-        console.log('possible coords: ' + x + ' ' + y);
+        x = Math.floor(Math.random() * (canvas.width - width));
+        y = Math.floor(Math.random() * (canvas.height - height));
 
-        if (x < w - getImageSide() || y < h - getImageSide()) {
-            isValid = true;
-        }
-    } while (!isValid);
-
-    console.log('found coords: ' + x + ' ' + y);
-    console.log('image side: ' + getImageSide());
+        overlap = squares.some(square => {
+            return x < square.x + square.width &&
+                x + width > square.x &&
+                y < square.y + square.height &&
+                y + height > square.y;
+        });
+    } while (overlap);
 
     return [x, y];
 }
 
-// Adjusted the function to accept the rendering context
-function makeSquares(ctx, count) {
-    for (let i = 0; i < count; i++) {
-        let coords = getRandomCoords();
-        let image = new Image();
-        image.crossOrigin = "anonymous";
-
-        // Set the source of the image to the imageURL in songList
-        image.src = songList[i];
-
-        // Draw the image on the canvas
-        image.onload = function () {
-            // Maintain aspect ratio while drawing the image
-            let aspectRatio = image.width / image.height;
-            let imgWidth = Math.min(getImageSide(), getImageSide() * aspectRatio);
-            let imgHeight = Math.min(getImageSide(), getImageSide() / aspectRatio);
-
-            // Draw the image on the canvas
-            ctx.drawImage(image, coords[0], coords[1], imgWidth, imgHeight);
-        }
-
-        console.log("Image drawn, do you see it?");
-    }
-}
