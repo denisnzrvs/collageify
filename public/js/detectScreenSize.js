@@ -2,52 +2,99 @@
 //1. Right now, the canvas where the image is created, is displayed right on the page. However, the page display is supposed to be just a preivew with image half the actual size. Right now, the canvas is half the actual size. Figure out a way to get the resulting image out of the canvas, show it on page and download. When it is achieved, do not add canvas to DOM and make it full-size. Images are also half-size!
 
 //2. To do:
-// Add 2 layers - refactor ovelap detection to work within isolated layers
+// Add 2 layers - refactor overlap detection to work within isolated layers
 // Refine image sizing and possibly positioning
+let songList = [];
 
-//stores squares on layer
+//stores images on canvases on layer
 let squares = [];
 
 //placeholder canvas
 let canvas = null;
 
-// Get the current URL
-const currentURL = window.location.href;
+//placeholder ctx
+let ctx = null;
 
-// Create a URL object
-const url = new URL(currentURL);
+//placeholder width
+let w = 0;
 
-// Get the 'data' parameter from the URL
-const dataParam = url.searchParams.get('data');
+//placeholder height
+let h = 0;
 
-// Parse the parameter value as JSON
-const songList = JSON.parse(decodeURIComponent(dataParam));
-console.log(songList);
-var ratio = window.devicePixelRatio || 1;
-var w = Math.round(screen.width * ratio);
-var h = Math.round(screen.height * ratio);
-console.log(w + 'x' + h)
+let ratio = 0;
 
-document.getElementById('screenSizeTest').innerHTML += 'Your resolution: ' + w + 'x' + h + '<br> Your ratio: ' + ratio + '<br> Your image data is loaded: ';
-let loadStatus = document.getElementById('screenSizeTest');
 
-if (songList.length > 0) {
-    loadStatus.innerHTML += 'true';
+function loadURLparams() {
+
+    // Get the current URL
+    const currentURL = window.location.href;
+
+    // Create a URL object
+    const url = new URL(currentURL);
+
+    // Get the 'data' parameter from the URL
+    const dataParam = url.searchParams.get('data');
+
+    // Parse the parameter value as JSON
+    songList = JSON.parse(decodeURIComponent(dataParam));
+    console.log(songList); // DEBUG
+
+    getScreenSize();
+}
+
+//sets up the collage canvas and div for displaying it
+function setupCollage() {
+
     // Create a canvas element
     canvas = document.createElement('canvas');
-    // Set the id of the canvas element
+
+    // Set id, dimensions of the canvas element
     canvas.id = 'collageCanvas';
     canvas.width = w;
     canvas.height = h;
+
     // Get the div element with id 'resultImage'
     const collageDiv = document.getElementById('resultImage');
     collageDiv.style.height = h / 2 + 'px';
     collageDiv.style.width = w / 2 + 'px';
+
     // Append the canvas element to the div
     collageDiv.appendChild(canvas);
 
     // Get the 2D rendering context of the canvas
-    let ctx = canvas.getContext('2d');
+    ctx = canvas.getContext('2d');
+
+}
+
+function getScreenSize() {
+
+    ratio = window.devicePixelRatio || 1;
+    w = Math.round(screen.width * ratio);
+    h = Math.round(screen.height * ratio);
+    console.log(w + 'x' + h)
+
+    document.getElementById('screenSizeTest').innerHTML += 'Your resolution: ' + w + 'x' + h + '<br> Your ratio: ' + ratio + '<br> Your image data is loaded: '; // DEBUG
+    if (songList.length > 0) {
+        document.getElementById('screenSizeTest').innerHTML += ' true';
+        setupCollage();
+        drawLayer1()
+    } else {
+        document.getElementById('screenSizeTest').innerHTML += ' false';
+    }
+
+
+}
+
+
+window.onload = function () {
+
+    loadURLparams();
+
+}
+
+
+
+function drawLayer1() {
 
     // Use the correct function call to get random coordinates
     let coords = getRandomCoords();
@@ -55,7 +102,7 @@ if (songList.length > 0) {
     // Counter to track loaded images
     let loadedImageCount = 0;
 
-    // Load images and draw on canvas
+
     // Load images and draw on canvas
     for (let i = 0; i < 10; i++) {
         let coords = getRandomCoords();
@@ -93,9 +140,8 @@ if (songList.length > 0) {
             }
         };
     }
-} else {
-    loadStatus.innerHTML += 'false';
 }
+
 
 
 function isOverlap(x, y, width, height) {
