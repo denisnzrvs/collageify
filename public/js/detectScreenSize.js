@@ -2,7 +2,6 @@
 //1. Right now, the canvas where the image is created, is displayed right on the page. However, the page display is supposed to be just a preivew with image half the actual size. Right now, the canvas is half the actual size. Figure out a way to get the resulting image out of the canvas, show it on page and download. When it is achieved, do not add canvas to DOM and make it full-size. Images are also half-size!
 
 //2. To do:
-// Add 2 layers - refactor overlap detection to work within isolated layers
 // Refine image sizing and possibly positioning
 let songList = [];
 
@@ -22,6 +21,7 @@ let w = 0;
 let h = 0;
 
 let ratio = 0;
+
 
 
 function loadURLparams() {
@@ -77,7 +77,7 @@ function getScreenSize() {
     if (songList.length > 0) {
         document.getElementById('screenSizeTest').innerHTML += ' true';
         setupCollage();
-        drawLayer1()
+        drawLayer1(0)
     } else {
         document.getElementById('screenSizeTest').innerHTML += ' false';
     }
@@ -94,53 +94,73 @@ window.onload = function () {
 
 
 
-function drawLayer1() {
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
 
-    // Use the correct function call to get random coordinates
-    let coords = getRandomCoords();
+async function drawLayer1(loadedImageCount) {
+    squares = [];
 
-    // Counter to track loaded images
-    let loadedImageCount = 0;
-
-
-    // Load images and draw on canvas
-    for (let i = 0; i < 10; i++) {
+    for (let i = loadedImageCount; i < loadedImageCount + 10 && i < songList.length; i++) {
         let coords = getRandomCoords();
         let image = new Image();
-
-        // Set the source of the image to the imageURL in songList
         image.src = songList[i];
 
-        // Set up the onload event to track when the image is loaded
-        image.onload = function () {
-            let aspectRatio = image.width / image.height;
-            let imgWidth = Math.min(getImageSide(), getImageSide() * aspectRatio);
-            let imgHeight = Math.min(getImageSide(), getImageSide() / aspectRatio);
+        await new Promise(resolve => {
+            image.onload = function () {
+                let aspectRatio = image.width / image.height;
+                let imgWidth = Math.min(getImageSide(), getImageSide() * aspectRatio);
+                let imgHeight = Math.min(getImageSide(), getImageSide() / aspectRatio);
 
-            let coords = getRandomCoords(imgWidth, imgHeight);
+                let coords = getRandomCoords(imgWidth, imgHeight);
 
-            ctx.drawImage(image, coords[0], coords[1], imgWidth, imgHeight);
+                ctx.drawImage(image, coords[0], coords[1], imgWidth, imgHeight);
 
-            // Add the image to the squares array
-            squares.push({
-                x: coords[0],
-                y: coords[1],
-                width: imgWidth,
-                height: imgHeight
-            });
+                squares.push({
+                    x: coords[0],
+                    y: coords[1],
+                    width: imgWidth,
+                    height: imgHeight
+                });
 
-            // Increment the loaded image count
-            loadedImageCount++;
+                resolve();
+            };
 
-            canvas.crossOrigin = "anonymous";
-            // Check if all images are loaded before setting href
-            if (loadedImageCount === 10) {
-                const downloadButton = document.getElementById('downloadBtn');
-                downloadButton.href = canvas.toDataURL();
-            }
-        };
+            image.onerror = function () {
+                // Handle image loading error
+                resolve();
+            };
+        });
+
+        await sleep(10); // Introduce a small delay to prevent synchronous blocking
+    }
+
+    if (loadedImageCount + 10 < songList.length) {
+        await sleep(1000); // Introduce a longer delay before the next batch
+        await drawLayer1(loadedImageCount + 10);
+    } else {
+        const downloadButton = document.getElementById('downloadBtn');
+        downloadButton.href = canvas.toDataURL();
+
+        // Remove canvas from the DOM after drawing to it
+        canvas.remove();
+
+        // Create a new image element for displaying the result
+        const resultImage = new Image();
+        resultImage.src = downloadButton.href;
+
+        // Adjust dimensions for half size
+        resultImage.width = w / 2;
+        resultImage.height = h / 2;
+
+        // Append the image to the 'resultImage' div
+        document.getElementById('resultImage').appendChild(resultImage);
     }
 }
+
+// Call drawLayer1 to initiate the process
+drawLayer1(loadedImageCount);
+
 
 
 
