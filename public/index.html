@@ -133,7 +133,7 @@
       function fetchTopTracks(access_token, callback) {
         var xhr = new XMLHttpRequest();
 
-        xhr.open('GET', 'https://api.spotify.com/v1/me/top/tracks?time_range=short_term&limit=20&offset=1', true);
+        xhr.open('GET', 'https://api.spotify.com/v1/me/top/tracks?time_range=long_term&limit=20&offset=1', true);
         xhr.setRequestHeader('Authorization', 'Bearer ' + access_token);
 
         xhr.onload = function () {
