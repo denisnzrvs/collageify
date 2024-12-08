@@ -25,7 +25,7 @@ let songList = [];
     if (access_token) {
 
       $.ajax({
-        url: 'https://api.spotify.com/v1/me/top/tracks?time_range=short_term&limit=20&offset=1',
+        url: 'https://api.spotify.com/v1/me/top/tracks?time_range=long_term&limit=20&offset=1',
         headers: {
           'Authorization': 'Bearer ' + access_token
         },
