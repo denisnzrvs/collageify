@@ -97,13 +97,13 @@ window.onload = function () {
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
-
 async function drawLayer1(loadedImageCount) {
     squares = [];
 
     for (let i = loadedImageCount; i < loadedImageCount + 10 && i < songList.length; i++) {
         let coords = getRandomCoords();
         let image = new Image();
+        image.crossOrigin = "anonymous"; // Helps with CORS issues
         image.src = songList[i];
 
         await new Promise(resolve => {
@@ -113,7 +113,6 @@ async function drawLayer1(loadedImageCount) {
                 let imgHeight = Math.min(getImageSide(), getImageSide() / aspectRatio);
 
                 let coords = getRandomCoords(imgWidth, imgHeight);
-
                 ctx.drawImage(image, coords[0], coords[1], imgWidth, imgHeight);
 
                 squares.push({
@@ -127,37 +126,59 @@ async function drawLayer1(loadedImageCount) {
             };
 
             image.onerror = function () {
-                // Handle image loading error
+                console.error("Failed to load image:", songList[i]);
                 resolve();
             };
         });
 
-        await sleep(10); // Introduce a small delay to prevent synchronous blocking
+        await sleep(10);
     }
 
     if (loadedImageCount + 10 < songList.length) {
-        await sleep(1000); // Introduce a longer delay before the next batch
+        await sleep(1000);
         await drawLayer1(loadedImageCount + 10);
     } else {
-        const downloadButton = document.getElementById('downloadBtn');
-        downloadButton.href = canvas.toDataURL();
+        console.log("Finished drawing, preparing download...");
 
-        // Remove canvas from the DOM after drawing to it
+        // Convert canvas to Blob and trigger download
+        canvas.toBlob(blob => {
+            if (blob) {
+                const url = URL.createObjectURL(blob);
+                const downloadButton = document.getElementById('downloadBtn');
+                
+                // Ensure download button is properly set up
+                downloadButton.href = url;
+                downloadButton.download = 'collage.png';
+
+                // Force the button to be clickable
+                downloadButton.style.display = "inline-block";
+
+                // Ensure clicking actually downloads
+                downloadButton.onclick = function () {
+                    const tempLink = document.createElement("a");
+                    tempLink.href = url;
+                    tempLink.download = "collage.png";
+                    document.body.appendChild(tempLink);
+                    tempLink.click();
+                    document.body.removeChild(tempLink);
+                    URL.revokeObjectURL(url); // Cleanup
+                };
+            } else {
+                console.error("Failed to create Blob from canvas");
+            }
+        });
+
+        // Remove canvas from the DOM
         canvas.remove();
 
         // Create a new image element for displaying the result
         const resultImage = new Image();
-        resultImage.src = downloadButton.href;
-
-        // Adjust dimensions for half size
+        resultImage.src = canvas.toDataURL(); // Still used for preview
         resultImage.width = w / 2;
         resultImage.height = h / 2;
-
-        // Append the image to the 'resultImage' div
         document.getElementById('resultImage').appendChild(resultImage);
     }
 }
-
 // Call drawLayer1 to initiate the process
 drawLayer1(loadedImageCount);
 
@@ -183,6 +204,8 @@ function getImageSide() {
 
 function getRandomCoords(width, height) {
     let x, y;
+    let attempts = 0; // Limit attempts to prevent infinite loop
+    let maxAttempts = 3;
     let overlap = false;
 
     do {
@@ -195,6 +218,12 @@ function getRandomCoords(width, height) {
                 y < square.y + square.height &&
                 y + height > square.y;
         });
+
+        attempts++;
+        if (attempts >= maxAttempts) {
+            console.warn("Max attempts reached, placing image without checking overlap");
+            break; // Stop checking and return the last position
+        }
     } while (overlap);
 
     return [x, y];
